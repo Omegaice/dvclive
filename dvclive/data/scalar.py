@@ -13,6 +13,12 @@ class Scalar(Data):
     suffixes = [".csv", ".tsv"]
     subfolder = "scalars"
 
+    def __init__(
+        self, name: str, output_folder: str, include_timestamp: bool
+    ) -> None:
+        self.include_timestamp = include_timestamp
+        super().__init__(name, output_folder)
+
     @staticmethod
     def could_log(val: object) -> bool:
         if isinstance(val, (int, float)):
@@ -36,10 +42,11 @@ class Scalar(Data):
         pass
 
     def step_dump(self) -> None:
-        ts = int(time.time() * 1000)
-        d = OrderedDict(
-            [("timestamp", ts), ("step", self.step), (self.name, self.val)]
-        )
+        d = OrderedDict()
+        if self.include_timestamp:
+            d["timestamp"] = int(time.time() * 1000)
+        d["step"] = self.step
+        d[self.name] = self.val
 
         existed = self.output_path.exists()
         with open(self.output_path, "a") as fobj:

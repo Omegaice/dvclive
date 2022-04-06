@@ -29,6 +29,7 @@ class Live:
         resume: bool = False,
         report: Optional[str] = "html",
         auto_open: bool = True,
+        scalar_timestamps: bool = True,
     ):
 
         self._path: Optional[str] = path
@@ -36,6 +37,7 @@ class Live:
         self._report: str = report
         self._checkpoint: bool = False
         self._auto_open: bool = auto_open
+        self._scalar_timestamps: bool = scalar_timestamps
         self.html_path = None
 
         self.init_from_env()
@@ -118,6 +120,10 @@ class Live:
     def summary_path(self):
         return str(self.dir) + ".json"
 
+    @property
+    def scalar_timestamps(self):
+        return self._scalar_timestamps
+
     def get_step(self) -> int:
         return self._step or 0
 
@@ -150,7 +156,7 @@ class Live:
         if name in self._scalars:
             data = self._scalars[name]
         else:
-            data = Scalar(name, self.dir)
+            data = Scalar(name, self.dir, self.scalar_timestamps)
             self._scalars[name] = data
 
         data.dump(val, self._step)
